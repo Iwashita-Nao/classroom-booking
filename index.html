@@ -17,14 +17,69 @@
     <div class="orb orb-3"></div>
   </div>
 
+  <!-- Firebase 初期設定オーバーレイ -->
+  <div id="setup-overlay" class="setup-overlay" role="dialog" aria-modal="true" aria-labelledby="setup-title">
+    <div class="setup-card">
+      <div class="setup-logo">🔥</div>
+      <h2 id="setup-title" class="setup-title">Firebase 接続設定</h2>
+      <p class="setup-desc">
+        全利用者で予約を共有するために、<br>
+        Firebase Realtime Database の URL を入力してください。
+      </p>
+
+      <div class="setup-steps">
+        <div class="setup-step">
+          <span class="step-num">1</span>
+          <span class="step-text">
+            <a href="https://console.firebase.google.com/" target="_blank" rel="noopener" class="step-link">
+              Firebase コンソール ↗
+            </a>
+            でプロジェクトを作成
+          </span>
+        </div>
+        <div class="setup-step">
+          <span class="step-num">2</span>
+          <span class="step-text">「Realtime Database」を作成（テストモードで開始）</span>
+        </div>
+        <div class="setup-step">
+          <span class="step-num">3</span>
+          <span class="step-text">下の欄に Database URL を貼り付け</span>
+        </div>
+      </div>
+
+      <div class="setup-input-group">
+        <label for="setup-url" class="setup-label">Database URL</label>
+        <input
+          type="url"
+          id="setup-url"
+          class="setup-input"
+          placeholder="https://your-project-default-rtdb.firebaseio.com"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <div id="setup-test-result" class="setup-result" aria-live="polite"></div>
+
+      <div class="setup-actions">
+        <button id="setup-test" class="setup-btn setup-btn--secondary">接続テスト</button>
+        <button id="setup-save" class="setup-btn setup-btn--primary">保存して接続</button>
+      </div>
+    </div>
+  </div>
+
   <header class="header">
     <div class="header-inner">
       <div class="logo">
         <span class="logo-icon">🏫</span>
         <span class="logo-text">教室予約管理</span>
       </div>
-      <div class="header-badge">
-        <span id="total-count">0</span> 件の予約
+      <div class="header-right">
+        <span id="conn-status" class="conn-status conn-status--connecting">⏳ 接続中</span>
+        <div class="header-badge">
+          <span id="total-count">0</span> 件の予約
+        </div>
+        <button id="setup-change-btn" class="settings-btn" title="Firebase設定" aria-label="Firebase設定を開く">⚙</button>
       </div>
     </div>
   </header>
