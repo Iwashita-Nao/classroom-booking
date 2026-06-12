@@ -1,0 +1,917 @@
+/* ============================================================
+   教室予約管理システム - スタイルシート
+   ============================================================ */
+
+/* --- CSS カスタムプロパティ (デザイントークン) --- */
+:root {
+  /* カラーパレット */
+  --clr-bg: #0d0f1a;
+  --clr-surface: rgba(255, 255, 255, 0.05);
+  --clr-surface-hover: rgba(255, 255, 255, 0.08);
+  --clr-border: rgba(255, 255, 255, 0.10);
+  --clr-border-focus: rgba(99, 179, 237, 0.6);
+
+  --clr-primary: #63b3ed;
+  --clr-primary-glow: rgba(99, 179, 237, 0.25);
+  --clr-accent: #9f7aea;
+  --clr-accent-glow: rgba(159, 122, 234, 0.25);
+  --clr-success: #68d391;
+  --clr-success-glow: rgba(104, 211, 145, 0.20);
+  --clr-danger: #fc8181;
+  --clr-danger-glow: rgba(252, 129, 129, 0.20);
+  --clr-warning: #f6e05e;
+
+  --clr-text-primary: #f0f4ff;
+  --clr-text-secondary: rgba(240, 244, 255, 0.65);
+  --clr-text-muted: rgba(240, 244, 255, 0.38);
+
+  /* Gradients */
+  --grad-primary: linear-gradient(135deg, #63b3ed 0%, #9f7aea 100%);
+  --grad-card: linear-gradient(145deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
+
+  /* タイポグラフィ */
+  --font-base: 'Noto Sans JP', sans-serif;
+
+  /* スペーシング */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* ボーダー半径 */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* シャドウ */
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255,255,255,0.06) inset;
+  --shadow-glow: 0 0 24px var(--clr-primary-glow);
+
+  /* トランジション */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-normal: 250ms;
+  --dur-slow: 400ms;
+}
+
+/* --- リセット & ベース --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-base);
+  background-color: var(--clr-bg);
+  color: var(--clr-text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* --- 背景オーブ (アニメーション) --- */
+.bg-orbs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  animation: orb-drift 20s ease-in-out infinite;
+}
+
+.orb-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #63b3ed, transparent 70%);
+  top: -200px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #9f7aea, transparent 70%);
+  bottom: -150px;
+  right: -100px;
+  animation-delay: -7s;
+}
+
+.orb-3 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #68d391, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: -14s;
+}
+
+@keyframes orb-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* --- ヘッダー --- */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(13, 15, 26, 0.80);
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-md) var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.logo-icon {
+  font-size: 1.4rem;
+}
+
+.logo-text {
+  font-size: 1.15rem;
+  font-weight: 700;
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+.header-badge {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-full);
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.8rem;
+  color: var(--clr-text-secondary);
+  font-weight: 500;
+}
+
+#total-count {
+  color: var(--clr-primary);
+  font-weight: 700;
+}
+
+/* --- メインコンテンツ --- */
+.main {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-xl);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+}
+
+/* --- カード --- */
+.card {
+  background: var(--grad-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow: hidden;
+  transition: box-shadow var(--dur-normal) var(--ease-out);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card), 0 0 40px rgba(99, 179, 237, 0.06);
+}
+
+.card-header {
+  padding: var(--space-lg) var(--space-xl);
+  border-bottom: 1px solid var(--clr-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  letter-spacing: -0.01em;
+}
+
+.title-icon {
+  font-size: 1rem;
+}
+
+.card-body {
+  padding: var(--space-xl);
+}
+
+/* --- フォーム --- */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.form-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--clr-text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.required {
+  color: var(--clr-danger);
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: var(--space-md);
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 0.7rem var(--space-md) 0.7rem 2.8rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  color: var(--clr-text-primary);
+  font-family: var(--font-base);
+  font-size: 0.95rem;
+  transition: border-color var(--dur-fast) var(--ease-in-out),
+              background var(--dur-fast) var(--ease-in-out),
+              box-shadow var(--dur-fast) var(--ease-in-out);
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.form-input::placeholder {
+  color: var(--clr-text-muted);
+}
+
+.form-input:focus,
+.form-select:focus {
+  border-color: var(--clr-border-focus);
+  background: rgba(99, 179, 237, 0.06);
+  box-shadow: 0 0 0 3px var(--clr-primary-glow);
+}
+
+.form-input.error,
+.form-select.error {
+  border-color: var(--clr-danger);
+  box-shadow: 0 0 0 3px var(--clr-danger-glow);
+}
+
+/* セレクトの矢印 */
+.form-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2363b3ed' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-md) center;
+  padding-right: 2.5rem;
+}
+
+.form-select option {
+  background: #1a1d2e;
+  color: var(--clr-text-primary);
+}
+
+/* --- 利用時間セレクター --- */
+.duration-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+}
+
+.duration-btn {
+  padding: 0.55rem var(--space-sm);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  color: var(--clr-text-secondary);
+  font-family: var(--font-base);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-in-out);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.duration-btn:hover {
+  background: rgba(99, 179, 237, 0.12);
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+  transform: translateY(-1px);
+}
+
+.duration-btn.active {
+  background: var(--grad-primary);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 16px var(--clr-primary-glow);
+  transform: translateY(-1px);
+}
+
+/* --- エラーメッセージ --- */
+.error-msg {
+  font-size: 0.78rem;
+  color: var(--clr-danger);
+  min-height: 1.1em;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity var(--dur-fast), transform var(--dur-fast);
+}
+
+.error-msg.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- 時間プレビュー --- */
+.time-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  background: rgba(99, 179, 237, 0.07);
+  border: 1px solid rgba(99, 179, 237, 0.20);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-lg);
+  transition: all var(--dur-normal) var(--ease-out);
+}
+
+.time-preview.has-time {
+  background: rgba(99, 179, 237, 0.12);
+  border-color: rgba(99, 179, 237, 0.40);
+  box-shadow: 0 0 20px rgba(99, 179, 237, 0.08);
+}
+
+.preview-label {
+  font-size: 0.85rem;
+  color: var(--clr-text-secondary);
+  font-weight: 500;
+}
+
+.preview-time {
+  font-size: 1.35rem;
+  font-weight: 700;
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- 送信ボタン --- */
+.submit-btn {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 0.9rem var(--space-xl);
+  background: var(--grad-primary);
+  border: none;
+  border-radius: var(--radius-full);
+  color: #fff;
+  font-family: var(--font-base);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out),
+              opacity var(--dur-fast);
+  box-shadow: 0 4px 20px var(--clr-primary-glow);
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px var(--clr-primary-glow);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+  font-style: normal;
+}
+
+.btn-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  transform: scale(0);
+  pointer-events: none;
+  width: 100px;
+  height: 100px;
+  animation: none;
+}
+
+.btn-ripple.animate {
+  animation: ripple 0.5s ease-out forwards;
+}
+
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* --- 検索 --- */
+.list-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: var(--space-md);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.search-input {
+  padding: 0.5rem var(--space-md) 0.5rem 2.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-full);
+  color: var(--clr-text-primary);
+  font-family: var(--font-base);
+  font-size: 0.88rem;
+  width: 200px;
+  transition: all var(--dur-fast) var(--ease-in-out);
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--clr-text-muted);
+}
+
+.search-input:focus {
+  border-color: var(--clr-border-focus);
+  background: rgba(99, 179, 237, 0.06);
+  box-shadow: 0 0 0 3px var(--clr-primary-glow);
+  width: 240px;
+}
+
+/* --- 予約リスト --- */
+.booking-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl) var(--space-xl);
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-md);
+  opacity: 0.6;
+}
+
+.empty-text {
+  font-size: 1rem;
+  color: var(--clr-text-secondary);
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.empty-sub {
+  font-size: 0.85rem;
+  color: var(--clr-text-muted);
+}
+
+/* --- 予約カードアイテム --- */
+.booking-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--dur-normal) var(--ease-out);
+  animation: slide-in var(--dur-slow) var(--ease-out) both;
+  position: relative;
+  overflow: hidden;
+}
+
+.booking-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--grad-primary);
+  border-radius: 3px 0 0 3px;
+}
+
+.booking-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(99, 179, 237, 0.25);
+  transform: translateX(2px);
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.booking-item.removing {
+  animation: slide-out var(--dur-normal) var(--ease-in-out) forwards;
+}
+
+@keyframes slide-out {
+  to { opacity: 0; transform: translateX(20px); max-height: 0; padding: 0; margin: 0; border-width: 0; }
+}
+
+.booking-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(99, 179, 237, 0.12);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(99, 179, 237, 0.20);
+}
+
+.booking-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.booking-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--clr-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.booking-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.booking-date {
+  font-size: 0.8rem;
+  color: var(--clr-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.booking-time {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--clr-primary);
+  background: rgba(99, 179, 237, 0.12);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(99, 179, 237, 0.25);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+
+.booking-duration-tag {
+  font-size: 0.75rem;
+  color: var(--clr-accent);
+  background: rgba(159, 122, 234, 0.12);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(159, 122, 234, 0.25);
+  font-weight: 600;
+}
+
+.delete-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(252, 129, 129, 0.08);
+  border: 1px solid rgba(252, 129, 129, 0.20);
+  border-radius: var(--radius-md);
+  color: var(--clr-danger);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-in-out);
+}
+
+.delete-btn:hover {
+  background: rgba(252, 129, 129, 0.20);
+  border-color: rgba(252, 129, 129, 0.50);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(252, 129, 129, 0.25);
+}
+
+/* --- トースト通知 --- */
+.toast-container {
+  position: fixed;
+  bottom: var(--space-xl);
+  right: var(--space-xl);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0.75rem var(--space-lg);
+  border-radius: var(--radius-lg);
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  pointer-events: auto;
+  animation: toast-in var(--dur-slow) var(--ease-out) both;
+  max-width: 340px;
+}
+
+.toast.success {
+  background: rgba(104, 211, 145, 0.15);
+  border: 1px solid rgba(104, 211, 145, 0.40);
+  color: var(--clr-success);
+}
+
+.toast.error {
+  background: rgba(252, 129, 129, 0.15);
+  border: 1px solid rgba(252, 129, 129, 0.40);
+  color: var(--clr-danger);
+}
+
+.toast.warning {
+  background: rgba(246, 224, 94, 0.12);
+  border: 1px solid rgba(246, 224, 94, 0.35);
+  color: var(--clr-warning);
+}
+
+.toast.hiding {
+  animation: toast-out var(--dur-normal) var(--ease-in-out) forwards;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(30px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toast-out {
+  to { opacity: 0; transform: translateX(30px) scale(0.95); }
+}
+
+/* --- モーダル --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.70);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  animation: fade-in var(--dur-normal) var(--ease-out) both;
+}
+
+.modal-overlay[hidden] {
+  display: none;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: linear-gradient(145deg, #1a1d2e, #141624);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  text-align: center;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  animation: modal-in var(--dur-slow) var(--ease-out) both;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-md);
+}
+
+.modal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+}
+
+.modal-desc {
+  font-size: 0.88rem;
+  color: var(--clr-text-secondary);
+  margin-bottom: var(--space-xl);
+  line-height: 1.7;
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 0.7rem var(--space-md);
+  border-radius: var(--radius-full);
+  font-family: var(--font-base);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-in-out);
+  border: none;
+}
+
+.modal-btn--cancel {
+  background: rgba(255,255,255,0.08);
+  color: var(--clr-text-secondary);
+  border: 1px solid var(--clr-border);
+}
+
+.modal-btn--cancel:hover {
+  background: rgba(255,255,255,0.12);
+  color: var(--clr-text-primary);
+}
+
+.modal-btn--confirm {
+  background: linear-gradient(135deg, #fc8181, #f6546a);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(252, 129, 129, 0.35);
+}
+
+.modal-btn--confirm:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(252, 129, 129, 0.45);
+}
+
+/* --- レスポンシブ対応 --- */
+@media (max-width: 768px) {
+  .main {
+    padding: var(--space-md);
+  }
+
+  .card-header {
+    padding: var(--space-md) var(--space-lg);
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card-body {
+    padding: var(--space-lg);
+  }
+
+  .header-inner {
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .duration-selector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .search-input {
+    width: 160px;
+  }
+
+  .search-input:focus {
+    width: 180px;
+  }
+
+  .booking-item {
+    padding: var(--space-md);
+  }
+
+  .toast-container {
+    bottom: var(--space-md);
+    right: var(--space-md);
+    left: var(--space-md);
+  }
+
+  .toast {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .duration-selector {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .booking-meta {
+    gap: var(--space-sm);
+  }
+}

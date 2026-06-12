@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="教室予約管理システム - 教室の追加・予約時間の管理ができます" />
+  <title>教室予約管理システム</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🏫</span>
+        <span class="logo-text">教室予約管理</span>
+      </div>
+      <div class="header-badge">
+        <span id="total-count">0</span> 件の予約
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- 教室追加フォーム -->
+    <section class="card form-card" aria-labelledby="form-title">
+      <div class="card-header">
+        <h1 id="form-title" class="card-title">
+          <span class="title-icon">➕</span>
+          教室・予約を追加
+        </h1>
+      </div>
+      <div class="card-body">
+        <form id="booking-form" novalidate>
+          <div class="form-grid">
+            <!-- 教室名 -->
+            <div class="form-group">
+              <label for="classroom-name" class="form-label">教室名 <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <span class="input-icon">🚪</span>
+                <input
+                  type="text"
+                  id="classroom-name"
+                  name="classroom-name"
+                  class="form-input"
+                  placeholder="例：101教室、理科室、体育館..."
+                  maxlength="50"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="error-msg" id="name-error" role="alert" aria-live="polite"></div>
+            </div>
+
+            <!-- 予約日 -->
+            <div class="form-group">
+              <label for="booking-date" class="form-label">予約日 <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <span class="input-icon">📅</span>
+                <input
+                  type="date"
+                  id="booking-date"
+                  name="booking-date"
+                  class="form-input"
+                />
+              </div>
+              <div class="error-msg" id="date-error" role="alert" aria-live="polite"></div>
+            </div>
+
+            <!-- 開始時刻 -->
+            <div class="form-group">
+              <label for="start-time" class="form-label">開始時刻 <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <span class="input-icon">🕐</span>
+                <select id="start-time" name="start-time" class="form-select">
+                  <option value="">選択してください</option>
+                </select>
+              </div>
+              <div class="error-msg" id="start-error" role="alert" aria-live="polite"></div>
+            </div>
+
+            <!-- 利用時間 -->
+            <div class="form-group">
+              <label class="form-label">利用時間 <span class="required">*</span></label>
+              <div class="duration-selector" id="duration-selector" role="group" aria-label="利用時間を選択">
+                <button type="button" class="duration-btn" data-minutes="30" id="dur-30">30分</button>
+                <button type="button" class="duration-btn" data-minutes="60" id="dur-60">1時間</button>
+                <button type="button" class="duration-btn" data-minutes="90" id="dur-90">1時間30分</button>
+                <button type="button" class="duration-btn" data-minutes="120" id="dur-120">2時間</button>
+              </div>
+              <div class="error-msg" id="duration-error" role="alert" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <!-- 時間プレビュー -->
+          <div class="time-preview" id="time-preview" aria-live="polite" role="status">
+            <span class="preview-label">予約時間：</span>
+            <span class="preview-time" id="preview-time">──:── ～ ──:──</span>
+          </div>
+
+          <!-- 追加ボタン -->
+          <button type="submit" class="submit-btn" id="submit-btn">
+            <span class="btn-icon">✓</span>
+            <span class="btn-text">予約を追加</span>
+            <span class="btn-ripple"></span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 予約一覧 -->
+    <section class="card list-card" aria-labelledby="list-title">
+      <div class="card-header">
+        <h2 id="list-title" class="card-title">
+          <span class="title-icon">📋</span>
+          予約一覧
+        </h2>
+        <div class="list-controls">
+          <div class="search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input
+              type="search"
+              id="search-input"
+              class="search-input"
+              placeholder="教室名で絞り込み..."
+              aria-label="教室名で絞り込み"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="booking-list" class="booking-list" role="list" aria-label="予約一覧">
+          <div class="empty-state" id="empty-state">
+            <div class="empty-icon">📭</div>
+            <p class="empty-text">予約はまだありません</p>
+            <p class="empty-sub">上のフォームから教室を追加してください</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- トーストメッセージ -->
+  <div id="toast-container" class="toast-container" role="region" aria-label="通知" aria-live="assertive"></div>
+
+  <!-- 削除確認モーダル -->
+  <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal">
+      <div class="modal-icon">⚠️</div>
+      <h3 id="modal-title" class="modal-title">予約を削除しますか？</h3>
+      <p id="modal-desc" class="modal-desc"></p>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="modal-btn modal-btn--cancel">キャンセル</button>
+        <button id="modal-confirm" class="modal-btn modal-btn--confirm">削除する</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
