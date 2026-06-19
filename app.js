@@ -356,6 +356,19 @@ function init() {
   DOM.dateInput.value = todayStr();
   DOM.dateInput.min   = todayStr();
 
+  // 教室名：アルファベット入力を即座に大文字へ変換（日本語・数字はそのまま）
+  DOM.nameInput.addEventListener('input', () => {
+    const el    = DOM.nameInput;
+    const start = el.selectionStart;
+    const end   = el.selectionEnd;
+    const upper = el.value.replace(/[a-z]/g, (c) => c.toUpperCase());
+    if (el.value !== upper) {
+      el.value = upper;
+      // カーソル位置を維持する
+      el.setSelectionRange(start, end);
+    }
+  });
+
   // イベントリスナー
   DOM.form.addEventListener('submit', handleSubmit);
   DOM.durationBtns.forEach((btn) => {
