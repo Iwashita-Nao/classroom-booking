@@ -22,48 +22,37 @@
     <div class="setup-card">
       <div class="setup-logo">🔥</div>
       <h2 id="setup-title" class="setup-title">Firebase 接続設定</h2>
-      <p class="setup-desc">
-        全利用者で予約を共有するために、<br>
-        Firebase Realtime Database の URL を入力してください。
-      </p>
-
+      <p class="setup-desc">全利用者で予約を共有するために、<br>Firebase Realtime Database の URL を入力してください。</p>
       <div class="setup-steps">
-        <div class="setup-step">
-          <span class="step-num">1</span>
-          <span class="step-text">
-            <a href="https://console.firebase.google.com/" target="_blank" rel="noopener" class="step-link">
-              Firebase コンソール ↗
-            </a>
-            でプロジェクトを作成
-          </span>
-        </div>
-        <div class="setup-step">
-          <span class="step-num">2</span>
-          <span class="step-text">「Realtime Database」を作成（テストモードで開始）</span>
-        </div>
-        <div class="setup-step">
-          <span class="step-num">3</span>
-          <span class="step-text">下の欄に Database URL を貼り付け</span>
-        </div>
+        <div class="setup-step"><span class="step-num">1</span><span class="step-text"><a href="https://console.firebase.google.com/" target="_blank" rel="noopener" class="step-link">Firebase コンソール ↗</a> でプロジェクトを作成</span></div>
+        <div class="setup-step"><span class="step-num">2</span><span class="step-text">「Realtime Database」を作成（テストモードで開始）</span></div>
+        <div class="setup-step"><span class="step-num">3</span><span class="step-text">下の欄に Database URL を貼り付け</span></div>
       </div>
-
       <div class="setup-input-group">
         <label for="setup-url" class="setup-label">Database URL</label>
-        <input
-          type="url"
-          id="setup-url"
-          class="setup-input"
-          placeholder="https://your-project-default-rtdb.firebaseio.com"
-          autocomplete="off"
-          spellcheck="false"
-        />
+        <input type="url" id="setup-url" class="setup-input" placeholder="https://your-project-default-rtdb.firebaseio.com" autocomplete="off" spellcheck="false" />
       </div>
-
       <div id="setup-test-result" class="setup-result" aria-live="polite"></div>
-
       <div class="setup-actions">
         <button id="setup-test" class="setup-btn setup-btn--secondary">接続テスト</button>
         <button id="setup-save" class="setup-btn setup-btn--primary">保存して接続</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理者ログインモーダル -->
+  <div id="admin-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="admin-title" hidden>
+    <div class="modal">
+      <div class="modal-icon">🔑</div>
+      <h3 id="admin-title" class="modal-title">管理者ログイン</h3>
+      <p class="modal-desc">管理者パスワードを入力すると、全予約を削除できます。</p>
+      <div class="admin-input-group">
+        <input type="password" id="admin-password" class="form-input" style="padding-left:1rem" placeholder="パスワードを入力" autocomplete="off" />
+        <div id="admin-error" class="error-msg" role="alert" aria-live="polite"></div>
+      </div>
+      <div class="modal-actions" style="margin-top:1.5rem">
+        <button id="admin-cancel" class="modal-btn modal-btn--cancel">キャンセル</button>
+        <button id="admin-confirm" class="modal-btn modal-btn--confirm">ログイン</button>
       </div>
     </div>
   </div>
@@ -76,130 +65,155 @@
       </div>
       <div class="header-right">
         <span id="conn-status" class="conn-status conn-status--connecting">⏳ 接続中</span>
-        <div class="header-badge">
-          <span id="total-count">0</span> 件の予約
-        </div>
+        <div class="header-badge"><span id="total-count">0</span> 件の予約</div>
+        <button id="admin-login-btn" class="settings-btn" title="管理者ログイン" aria-label="管理者ログイン">🔑</button>
         <button id="setup-change-btn" class="settings-btn" title="Firebase設定" aria-label="Firebase設定を開く">⚙</button>
       </div>
     </div>
+    <!-- 管理者バー -->
+    <div id="admin-bar" class="admin-bar" hidden>
+      <span class="admin-bar-label">🔑 管理者モード</span>
+      <button id="admin-delete-all" class="admin-delete-all-btn">全予約を削除</button>
+      <button id="admin-logout" class="admin-logout-btn">ログアウト</button>
+    </div>
   </header>
 
+  <!-- ビュー切り替えタブ -->
+  <div class="view-tabs" role="tablist">
+    <button class="view-tab active" data-view="list" role="tab" aria-selected="true" id="tab-list">📋 リスト</button>
+    <button class="view-tab" data-view="calendar" role="tab" aria-selected="false" id="tab-calendar">📅 カレンダー</button>
+  </div>
+
   <main class="main">
-    <!-- 教室追加フォーム -->
-    <section class="card form-card" aria-labelledby="form-title">
-      <div class="card-header">
-        <h1 id="form-title" class="card-title">
-          <span class="title-icon">➕</span>
-          教室・予約を追加
-        </h1>
-      </div>
-      <div class="card-body">
-        <form id="booking-form" novalidate>
-          <div class="form-grid">
-            <!-- 教室名 -->
-            <div class="form-group">
-              <label for="classroom-name" class="form-label">教室名 <span class="required">*</span></label>
-              <div class="input-wrapper">
-                <span class="input-icon">🚪</span>
-                <input
-                  type="text"
-                  id="classroom-name"
-                  name="classroom-name"
-                  class="form-input"
-                  placeholder="例：101教室、理科室、体育館..."
-                  maxlength="50"
-                  autocomplete="off"
-                />
+
+    <!-- ===== リストビュー ===== -->
+    <div id="view-list" class="view-panel">
+      <!-- 予約フォーム -->
+      <section class="card form-card" aria-labelledby="form-title">
+        <div class="card-header">
+          <h1 id="form-title" class="card-title"><span class="title-icon">➕</span>教室・予約を追加</h1>
+        </div>
+        <div class="card-body">
+          <form id="booking-form" novalidate>
+            <div class="form-grid">
+              <!-- 教室名 -->
+              <div class="form-group">
+                <label for="classroom-name" class="form-label">教室名 <span class="required">*</span></label>
+                <div class="input-wrapper">
+                  <span class="input-icon">🚪</span>
+                  <input type="text" id="classroom-name" name="classroom-name" class="form-input" placeholder="例：101教室、理科室..." maxlength="50" autocomplete="off" />
+                </div>
+                <div class="error-msg" id="name-error" role="alert" aria-live="polite"></div>
               </div>
-              <div class="error-msg" id="name-error" role="alert" aria-live="polite"></div>
+              <!-- 予約日 -->
+              <div class="form-group">
+                <label for="booking-date" class="form-label">予約日 <span class="required">*</span></label>
+                <div class="input-wrapper">
+                  <span class="input-icon">📅</span>
+                  <input type="date" id="booking-date" name="booking-date" class="form-input" />
+                </div>
+                <div class="error-msg" id="date-error" role="alert" aria-live="polite"></div>
+              </div>
+              <!-- 開始時刻 -->
+              <div class="form-group">
+                <label for="start-time" class="form-label">開始時刻 <span class="required">*</span></label>
+                <div class="input-wrapper">
+                  <span class="input-icon">🕐</span>
+                  <select id="start-time" name="start-time" class="form-select">
+                    <option value="">選択してください</option>
+                  </select>
+                </div>
+                <div class="error-msg" id="start-error" role="alert" aria-live="polite"></div>
+              </div>
+              <!-- 利用時間 -->
+              <div class="form-group">
+                <label class="form-label">利用時間 <span class="required">*</span></label>
+                <div class="duration-selector" role="group" aria-label="利用時間を選択">
+                  <button type="button" class="duration-btn" data-minutes="30">30分</button>
+                  <button type="button" class="duration-btn" data-minutes="60">1時間</button>
+                  <button type="button" class="duration-btn" data-minutes="90">1時間30分</button>
+                  <button type="button" class="duration-btn" data-minutes="120">2時間</button>
+                </div>
+                <div class="error-msg" id="duration-error" role="alert" aria-live="polite"></div>
+              </div>
+              <!-- 利用目的タグ -->
+              <div class="form-group">
+                <label class="form-label">利用目的</label>
+                <div class="tag-selector" role="group" aria-label="利用目的を選択">
+                  <button type="button" class="tag-btn" data-tag="授業" data-color="blue">📚 授業</button>
+                  <button type="button" class="tag-btn" data-tag="部活" data-color="green">⚽ 部活</button>
+                  <button type="button" class="tag-btn" data-tag="会議" data-color="purple">💼 会議</button>
+                  <button type="button" class="tag-btn" data-tag="自習" data-color="orange">✏️ 自習</button>
+                  <button type="button" class="tag-btn" data-tag="イベント" data-color="pink">🎉 イベント</button>
+                  <button type="button" class="tag-btn" data-tag="その他" data-color="gray">📌 その他</button>
+                </div>
+              </div>
+              <!-- メモ欄 -->
+              <div class="form-group">
+                <label for="booking-memo" class="form-label">メモ（任意）</label>
+                <div class="input-wrapper">
+                  <span class="input-icon">📝</span>
+                  <input type="text" id="booking-memo" name="booking-memo" class="form-input" placeholder="備考・人数・担当者など..." maxlength="100" autocomplete="off" />
+                </div>
+              </div>
             </div>
 
-            <!-- 予約日 -->
-            <div class="form-group">
-              <label for="booking-date" class="form-label">予約日 <span class="required">*</span></label>
-              <div class="input-wrapper">
-                <span class="input-icon">📅</span>
-                <input
-                  type="date"
-                  id="booking-date"
-                  name="booking-date"
-                  class="form-input"
-                />
-              </div>
-              <div class="error-msg" id="date-error" role="alert" aria-live="polite"></div>
+            <!-- 時間プレビュー -->
+            <div class="time-preview" id="time-preview" aria-live="polite" role="status">
+              <span class="preview-label">予約時間：</span>
+              <span class="preview-time" id="preview-time">──:── ～ ──:──</span>
             </div>
 
-            <!-- 開始時刻 -->
-            <div class="form-group">
-              <label for="start-time" class="form-label">開始時刻 <span class="required">*</span></label>
-              <div class="input-wrapper">
-                <span class="input-icon">🕐</span>
-                <select id="start-time" name="start-time" class="form-select">
-                  <option value="">選択してください</option>
-                </select>
-              </div>
-              <div class="error-msg" id="start-error" role="alert" aria-live="polite"></div>
+            <button type="submit" class="submit-btn" id="submit-btn">
+              <span class="btn-icon">✓</span>
+              <span class="btn-text">予約を追加</span>
+              <span class="btn-ripple"></span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- 予約一覧 -->
+      <section class="card list-card" aria-labelledby="list-title">
+        <div class="card-header">
+          <h2 id="list-title" class="card-title"><span class="title-icon">📋</span>予約一覧</h2>
+          <div class="list-controls">
+            <div class="search-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="search" id="search-input" class="search-input" placeholder="教室名・目的で絞り込み..." aria-label="絞り込み" />
             </div>
-
-            <!-- 利用時間 -->
-            <div class="form-group">
-              <label class="form-label">利用時間 <span class="required">*</span></label>
-              <div class="duration-selector" id="duration-selector" role="group" aria-label="利用時間を選択">
-                <button type="button" class="duration-btn" data-minutes="30" id="dur-30">30分</button>
-                <button type="button" class="duration-btn" data-minutes="60" id="dur-60">1時間</button>
-                <button type="button" class="duration-btn" data-minutes="90" id="dur-90">1時間30分</button>
-                <button type="button" class="duration-btn" data-minutes="120" id="dur-120">2時間</button>
-              </div>
-              <div class="error-msg" id="duration-error" role="alert" aria-live="polite"></div>
-            </div>
-          </div>
-
-          <!-- 時間プレビュー -->
-          <div class="time-preview" id="time-preview" aria-live="polite" role="status">
-            <span class="preview-label">予約時間：</span>
-            <span class="preview-time" id="preview-time">──:── ～ ──:──</span>
-          </div>
-
-          <!-- 追加ボタン -->
-          <button type="submit" class="submit-btn" id="submit-btn">
-            <span class="btn-icon">✓</span>
-            <span class="btn-text">予約を追加</span>
-            <span class="btn-ripple"></span>
-          </button>
-        </form>
-      </div>
-    </section>
-
-    <!-- 予約一覧 -->
-    <section class="card list-card" aria-labelledby="list-title">
-      <div class="card-header">
-        <h2 id="list-title" class="card-title">
-          <span class="title-icon">📋</span>
-          予約一覧
-        </h2>
-        <div class="list-controls">
-          <div class="search-wrapper">
-            <span class="search-icon">🔍</span>
-            <input
-              type="search"
-              id="search-input"
-              class="search-input"
-              placeholder="教室名で絞り込み..."
-              aria-label="教室名で絞り込み"
-            />
           </div>
         </div>
-      </div>
-      <div class="card-body">
-        <div id="booking-list" class="booking-list" role="list" aria-label="予約一覧">
-          <div class="empty-state" id="empty-state">
-            <div class="empty-icon">📭</div>
-            <p class="empty-text">予約はまだありません</p>
-            <p class="empty-sub">上のフォームから教室を追加してください</p>
+        <div class="card-body">
+          <div id="booking-list" class="booking-list" role="list" aria-label="予約一覧">
+            <div class="empty-state" id="empty-state">
+              <div class="empty-icon">📭</div>
+              <p class="empty-text">予約はまだありません</p>
+              <p class="empty-sub">上のフォームから教室を追加してください</p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
+
+    <!-- ===== カレンダービュー ===== -->
+    <div id="view-calendar" class="view-panel" hidden>
+      <section class="card" aria-labelledby="cal-title">
+        <div class="card-header">
+          <h2 id="cal-title" class="card-title"><span class="title-icon">📅</span>週間カレンダー</h2>
+          <div class="cal-nav">
+            <button id="cal-prev" class="cal-nav-btn" aria-label="前の週">‹</button>
+            <span id="cal-range" class="cal-range"></span>
+            <button id="cal-next" class="cal-nav-btn" aria-label="次の週">›</button>
+            <button id="cal-today" class="cal-today-btn">今週</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0; overflow-x:auto;">
+          <div id="calendar-grid" class="calendar-grid"></div>
+        </div>
+      </section>
+    </div>
+
   </main>
 
   <!-- トーストメッセージ -->
