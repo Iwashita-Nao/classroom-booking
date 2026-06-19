@@ -8,7 +8,8 @@
 // ============================================================
 // 定数・設定
 // ============================================================
-const CONFIG_KEY = 'classroom_firebase_url';
+const CONFIG_KEY        = 'classroom_firebase_url';
+const OWNER_TOKEN_KEY   = 'classroom_owner_token';
 
 const DURATION_OPTIONS = [
   { minutes: 30,  label: '30分' },
@@ -98,6 +99,22 @@ function calcEndTime(startTime, durationMinutes) {
 
 function generateId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+/**
+ * このブラウザ固有のオーナートークンを取得または生成する
+ * localStorage に永続保存されるため、同じブラウザからは常に同じトークンを返す
+ */
+function getOwnerToken() {
+  let token = localStorage.getItem(OWNER_TOKEN_KEY);
+  if (!token) {
+    // crypto.randomUUID が使えればそちらを優先（よりセキュア）
+    token = typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem(OWNER_TOKEN_KEY, token);
+  }
+  return token;
 }
 
 function formatDateJP(dateStr) {
@@ -511,6 +528,7 @@ async function handleSubmit(e) {
     durationMinutes: selectedDuration,
     durationLabel,
     createdAt: new Date().toISOString(),
+    ownerToken: getOwnerToken(), // 予約者のブラウザ固有トークン
   };
 
   try {
@@ -577,6 +595,9 @@ function createBookingItem(booking, index) {
   item.dataset.key = booking._key ?? '';
   item.style.animationDelay = `${index * 40}ms`;
 
+  // 自分が作成した予約かどうかをトークンで判定
+  const isOwner = booking.ownerToken && booking.ownerToken === getOwnerToken();
+
   item.innerHTML = `
     <div class="booking-icon">🏫</div>
     <div class="booking-info">
@@ -585,17 +606,21 @@ function createBookingItem(booking, index) {
         <span class="booking-date">📅 ${formatDateJP(booking.date)}</span>
         <span class="booking-time">${booking.startTime} ～ ${booking.endTime}</span>
         <span class="booking-duration-tag">⏱ ${booking.durationLabel}</span>
+        ${isOwner ? '<span class="owner-tag">✏ 自分の予約</span>' : ''}
       </div>
     </div>
+    ${isOwner ? `
     <button
       class="delete-btn"
       aria-label="${escapeHtml(booking.name)}の予約を削除"
       data-id="${booking.id}"
       title="削除"
-    >🗑</button>
+    >🗑</button>` : '<div class="delete-placeholder"></div>'}
   `;
 
-  item.querySelector('.delete-btn').addEventListener('click', () => openModal(booking));
+  if (isOwner) {
+    item.querySelector('.delete-btn').addEventListener('click', () => openModal(booking));
+  }
   return item;
 }
 

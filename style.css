@@ -674,6 +674,12 @@ body {
 .booking-time { font-size: 0.82rem; font-weight: 700; color: var(--clr-primary); background: rgba(99, 179, 237, 0.12); padding: 2px 10px; border-radius: var(--radius-full); border: 1px solid rgba(99, 179, 237, 0.25); font-variant-numeric: tabular-nums; letter-spacing: 0.03em; }
 .booking-duration-tag { font-size: 0.75rem; color: var(--clr-accent); background: rgba(159, 122, 234, 0.12); padding: 2px 10px; border-radius: var(--radius-full); border: 1px solid rgba(159, 122, 234, 0.25); font-weight: 600; }
 
+/* 自分の予約バッジ */
+.owner-tag { font-size: 0.72rem; color: var(--clr-success); background: rgba(104, 211, 145, 0.10); padding: 2px 10px; border-radius: var(--radius-full); border: 1px solid rgba(104, 211, 145, 0.28); font-weight: 600; }
+
+/* 他人の予約では削除ボタンの代わりにスペース確保 */
+.delete-placeholder { flex-shrink: 0; width: 36px; height: 36px; }
+
 .delete-btn {
   flex-shrink: 0;
   width: 36px;
